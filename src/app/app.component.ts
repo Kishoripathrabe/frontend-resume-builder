@@ -4,6 +4,7 @@ import {Component} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {BehaviorSubject, Observable, combineLatest} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
+import { AlertService } from './services/alert-service';
 
 @Component({
   selector: 'app-root',
@@ -51,15 +52,17 @@ export class AppComponent {
   mySubject = new BehaviorSubject('hello world!');
   observer: Observable<any>;
 
-  constructor( private apiService: ApiService) {
+  constructor( private apiService: ApiService, private alertService: AlertService) {
     this.loginForm = new FormGroup({
       email: new FormControl(null, [Validators.required, Validators.email]),
       password: new FormControl(null, [Validators.required, Validators.maxLength(12), Validators.minLength(8)])
     });
     this.apiService.getUsers().subscribe((data)=> {
-        console.log(data); 
+      console.log(data);
+      this.alertService.sucess('done');
     },(error:any)=>{
-      console.log(error);
+      console.log("errormsg",error);
+      this.alertService.error(error.message);
     });
     const observableA = this.loginForm.valueChanges;
     const observableB = new Observable((emitter) => {
